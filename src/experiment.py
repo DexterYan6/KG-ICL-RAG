@@ -12,6 +12,8 @@ from tqdm import tqdm
 from torch.nn import init
 import sys
 
+import torch.nn.functional as F
+
 
 class Experiment(object):
     def __init__(self, args):
@@ -237,3 +239,22 @@ class Experiment(object):
         v_mrr = np.mean(v_mrr_list)
         out_str = ''.join(out_str_list)
         return v_mrr, out_str
+    
+    def retrieve_from_kg(self, subject, relation, top_k=5):
+        """
+        Retrieve the top-k entities based on a given subject-relation pair.
+        """
+        self.model.eval()
+        
+        # Convert subject & relation to tensor format
+        subject_tensor = torch.tensor([subject], dtype=torch.long, device=self.args.device)
+        relation_tensor = torch.tensor([relation], dtype=torch.long, device=self.args.device)
+
+        # Predict entity scores
+        with torch.no_grad():
+            scores = self.model(subject_tensor, relation_tensor, loader=None, training=False)[0]  # (num_entities,)
+
+        # Rank entities based on scores
+        ranked_entities = torch.argsort(scores, descending=True)[:top_k]
+        
+        return ranked_entities.cpu().tolist()
