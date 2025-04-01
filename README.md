@@ -1,7 +1,14 @@
 
 # A Prompt-based Knowledge Graph Foundation Model for Universal In-Context Reasoning
 
+This repo is based on the KG-ICL [repo](https://github.com/nju-websoft/KG-ICL) 
+It is based on the following [paper](http://arxiv.org/abs/2410.12288)
 
+This repo is tracking the changes I am making in an attempt to create and test a KG-ICL RAG
+
+# Instructions
+Like the creators, I am also using Python 3.9 to run the code.
+All the libraries I have installed exist in requirements.txt.
 
 ### Dataset Triple Extraction
 
@@ -24,6 +31,13 @@ The `preprocess_tsv` creates the necessary files needed to pretrain the KG-ICL m
 ```bash
 python preprocess.py --dataset hotpot_triples.tsv --output_dir ./processed_data/name of dataset
 ```
+
+# pre-training
+```bash
+cd src
+python pretrain.py
+```
+
 ### HotpotQA Evaluation Script
 Evaluates KG-ICL (Knowledge Graph Informed Context Learning) on HotpotQA dataset using custom F1, recall, precison, and exact matching.
 
