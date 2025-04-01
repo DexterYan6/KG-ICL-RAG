@@ -69,9 +69,9 @@ def prepare(args):
 parser = argparse.ArgumentParser(description="Parser for KG-ICL")
 
 # dataset
-parser.add_argument('--train_dataset_list', type=str, default='fb237_v1 nell_v1 codex-s')
-parser.add_argument('--valid_dataset_list', type=str, default='fb237_v1 nell_v1 codex-s')
-parser.add_argument('--test_dataset_list', default='fb237_v1_ind nell_v1_ind codex-s')
+parser.add_argument('--train_dataset_list', type=str, default='wikidata')
+parser.add_argument('--valid_dataset_list', type=str, default='wikidata')
+parser.add_argument('--test_dataset_list', default='wikidata')
 parser.add_argument('--train_part', type=str, default='train')
 parser.add_argument('--valid_part', type=str, default='valid')
 parser.add_argument('--test_part', type=str, default='test')
@@ -90,14 +90,14 @@ parser.add_argument('--prompt_graph_type', type=str, default='all', choices=['al
 parser.add_argument('--early_stop', type=int, default=5)
 
 # hyper_parameters
-parser.add_argument('--shot', type=int, default=5)
-parser.add_argument('--hidden_dim', type=int, default=32)
-parser.add_argument('--attn_dim', type=int, default=5)
-parser.add_argument('--n_epochs', type=int, default=100)
-parser.add_argument('--n_relation_encoder_layer', type=int, default=3)
-parser.add_argument('--n_layer', type=int, default=6)
-parser.add_argument('--train_batch_size', type=int, default=75)
-parser.add_argument('--test_batch_size', type=int, default=512)
+parser.add_argument('--shot', type=int, default=3)
+parser.add_argument('--hidden_dim', type=int, default=16)
+parser.add_argument('--attn_dim', type=int, default=3)
+parser.add_argument('--n_epochs', type=int, default=12)
+parser.add_argument('--n_relation_encoder_layer', type=int, default=2)
+parser.add_argument('--n_layer', type=int, default=3)
+parser.add_argument('--train_batch_size', type=int, default=5)
+parser.add_argument('--test_batch_size', type=int, default=256)
 
 # optimizer
 parser.add_argument('--lr', type=float, default=0.0005)
@@ -116,7 +116,7 @@ parser.add_argument('--log_path', type=str, default='../log/pretrain/')
 parser.add_argument('--save_path', type=str, default='../checkpoint/pretrain/')
 parser.add_argument('--seed', type=str, default=1234)
 parser.add_argument('--gpu', type=str, default=0)
-parser.add_argument('--use_rspmm', type=bool, default=True)
+parser.add_argument('--use_rspmm', type=bool, default=False)
 parser.add_argument('--note', type=str, default='')
 
 
@@ -133,8 +133,7 @@ args = parser.parse_args()
 
 args.train_dataset_list = args.train_dataset_list.split()
 args.valid_dataset_list = args.valid_dataset_list.split()
-if args.test_dataset_list is not None and len(args.test_dataset_list.split()) > 1:
-    args.test_dataset_list = args.test_dataset_list.split()
+args.test_dataset_list = args.test_dataset_list.split()
 
 args.train_dirs = [os.path.join(args.data_path, dataset, args.train_part) for dataset in args.train_dataset_list] if args.train_dataset_list is not None else None
 args.valid_dirs = [os.path.join(args.data_path, dataset, args.valid_part) for dataset in args.valid_dataset_list] if args.valid_dataset_list is not None else None
@@ -154,8 +153,9 @@ prepare(args)
 
 if __name__ == '__main__':
     args.logger.info(args)
+    print("step experiment")
     experiment = Experiment(args)
-
+    print("done experiment")
     best_mrr = 0
     stop = 0
     # fb_v1, nell_v1, codex-s

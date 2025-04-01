@@ -82,7 +82,7 @@ def prepare(args):
 
 parser = argparse.ArgumentParser(description="Parser for KGFM")
 
-parser.add_argument('--checkpoint_path', type=str, default='../checkpoint/pretrain/KG-ICL-6L')
+parser.add_argument('--checkpoint_path', type=str, default='../checkpoint/KG-ICL-6L')
 parser.add_argument('--train_dataset_list', type=str, default=None)
 parser.add_argument('--valid_dataset_list', type=str, default=None)
 parser.add_argument('--test_dataset_list', type=str, default='WN18RR_v1_ind')
@@ -126,7 +126,7 @@ parser.add_argument('--log_path', type=str, default='../log/pretrain/')
 parser.add_argument('--save_path', type=str, default='../checkpoint/pretrain/')
 parser.add_argument('--seed', type=str, default=1)
 parser.add_argument('--gpu', type=str, default='0')
-parser.add_argument('--use_rspmm', type=bool, default=True)
+parser.add_argument('--use_rspmm', type=bool, default=False)
 parser.add_argument('--note', type=str, default='')
 
 args = parser.parse_args()

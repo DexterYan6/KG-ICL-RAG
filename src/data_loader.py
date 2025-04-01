@@ -6,6 +6,7 @@ import networkx as nx
 from scipy.sparse import csr_matrix
 from tqdm import tqdm
 from utils import *
+import pandas as pd
 
 
 class DataLoader:
@@ -105,15 +106,51 @@ class DataLoader:
     #                             shape=(self.fact_num, self.kg.entity_num))
 
     # torch version
-    def build_graph(self, triples):
-        self.graph = torch.LongTensor(triples).to(self.args.device)
-        self.fact_num = self.graph.size(0)
-        indices_A = torch.cat([torch.arange(self.fact_num).long().unsqueeze(1).to(self.args.device), self.graph[:, 0].unsqueeze(1)], dim=1).t().to(self.args.device)
-        values_A = torch.ones((self.fact_num,)).to(self.args.device)
-        size_A = torch.Size([self.fact_num, self.kg.entity_num])
-        self.M_sub = torch.sparse_coo_tensor(indices_A, values_A, size_A).to(self.args.device)
-        indices_B = torch.cat([torch.arange(self.fact_num).long().unsqueeze(1).to(self.args.device), self.graph[:, 2].unsqueeze(1)], dim=1).t().to(self.args.device)
-        self.M_obj = torch.sparse_coo_tensor(indices_B, values_A, size_A).to(self.args.device)
+    def build_graph(self, facts):
+        """Build the graph structure from facts with proper dimensionality"""
+        self.fact_num = len(facts)
+        
+        # Convert facts to tensor with proper shape (fact_num, 3)
+        try:
+            # First verify facts is in correct format
+            if not isinstance(facts, (list, tuple, np.ndarray)):
+                raise ValueError(f"Facts must be list, tuple or numpy array, got {type(facts)}")
+                
+            # Convert facts to tensor
+            if isinstance(facts, np.ndarray):
+                self.graph = torch.from_numpy(facts).long()
+            else:
+                self.graph = torch.tensor(facts, dtype=torch.long)
+                
+            # Ensure proper shape
+            if len(self.graph.shape) != 2 or self.graph.shape[1] != 3:
+                raise ValueError(f"Facts tensor must have shape (N, 3), got {self.graph.shape}")
+                
+            # Move to device
+            self.graph = self.graph.to(self.args.device)
+            
+            # Build sparse adjacency matrices
+            indices_A = torch.cat([
+                torch.arange(self.fact_num).to(self.args.device).long().unsqueeze(1),
+                self.graph[:, 0].unsqueeze(1)
+            ], dim=1).t()
+            
+            indices_B = torch.cat([
+                torch.arange(self.fact_num).to(self.args.device).long().unsqueeze(1),
+                self.graph[:, 2].unsqueeze(1)
+            ], dim=1).t()
+            
+            values = torch.ones(self.fact_num).to(self.args.device)
+            size = torch.Size([self.fact_num, self.kg.entity_num])
+            
+            self.M_sub = torch.sparse_coo_tensor(indices_A, values, size).to(self.args.device)
+            self.M_obj = torch.sparse_coo_tensor(indices_B, values, size).to(self.args.device)
+            
+        except Exception as e:
+            print(f"Error in build_graph: {e}")
+            print(f"Facts shape: {np.array(facts).shape}")
+            print(f"First few facts: {facts[:5]}")
+            raise
 
 
 class KG:
@@ -127,6 +164,7 @@ class KG:
         v_path = path.replace('train', 'valid').replace('test', 'valid')
         valid_background = self.load_triple(v_path+'/background.txt')
         valid_data = self.load_triple(v_path+'/facts.txt')
+        self.fact_triple = pd.read_csv(path + '/fact_to_sentence.txt', sep='\t', header=None).values.tolist() if os.path.exists(path + '/fact_to_sentence.txt') else []
         self.answer_distance = get_distance(valid_data, valid_background)
         self.background = self.load_triple(path+'/background.txt')
         self.train_batch_size = args.train_batch_size
