@@ -216,7 +216,6 @@ class TripleExtractor:
         
         logger.info(f"Triples extracted and saved to {output_file}")
 
-
 # Command-line interface
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract triples from HotpotQA in specified format")
