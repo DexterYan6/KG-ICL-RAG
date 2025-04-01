@@ -24,3 +24,16 @@ The `preprocess_tsv` creates the necessary files needed to pretrain the KG-ICL m
 ```bash
 python preprocess.py --dataset hotpot_triples.tsv --output_dir ./processed_data/name of dataset
 ```
+### HotpotQA Evaluation Script
+Evaluates KG-ICL (Knowledge Graph Informed Context Learning) on HotpotQA dataset using custom F1, recall, precison, and exact matching.
+
+```bash
+python hotpotqa_evaluator.py --hotpotqa_file hotpotqa_data.json
+```
+
+### Natural Questions Evaluation Script
+Same thing as the HotpotQA eval script but evaluating Natural Questions
+
+```bash
+python nq_evaluator.py --nq_file natural_questions.jsonl
+```
