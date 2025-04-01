@@ -3,7 +3,7 @@
 
 
 
-### Natural Questions Triple Extraction Usage
+### Dataset Triple Extraction
 
 The `nq_2_triple` processes the Natural Questions dataset to extract semantic relationships:
 
