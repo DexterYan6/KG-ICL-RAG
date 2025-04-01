@@ -328,6 +328,7 @@ def safe_parse_dict_string(dict_str):
     return None
 
 def main():
+    #necessary arguments so KG-ICL can work with RAG
     args = {
         'hidden_dim': 16,
         'attn_dim': 3,
