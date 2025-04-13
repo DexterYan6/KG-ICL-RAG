@@ -29,7 +29,7 @@ python hotpot_2_triple.py --input path/to/nq_data.jsonl --output path/to/output_
 The `preprocess_tsv` creates the necessary files needed to pretrain the KG-ICL model
 
 ```bash
-python preprocess.py --dataset hotpot_triples.tsv --output_dir ./processed_data/name of dataset
+python preprocess_tsv --dataset hotpot_triples.tsv --output_dir ./processed_data/name of dataset
 ```
 
 # pre-training
